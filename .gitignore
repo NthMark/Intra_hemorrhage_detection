@@ -47,6 +47,7 @@ mlartifacts/
 # ── Reports & figures ─────────────────────────────────────────────────────────
 reports/figures/
 reports/metrics/paper_writing/
+paper_writing/
 
 # ── Reference code (cloned external repo — link in README) ───────────────────
 reference_code/
