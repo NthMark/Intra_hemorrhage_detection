@@ -1,0 +1,72 @@
+stages:
+  prepare:
+    cmd: python scripts/prepare_data.py --params params.yaml
+    deps:
+      - scripts/prepare_data.py
+      - src/features/build_features.py
+      - dataset/
+    params:
+      - params.yaml:
+          - base.random_seed
+          - data.train_split
+          - data.val_split
+    outs:
+      - data/raw/
+      - data/processed/train.csv
+      - data/processed/val.csv
+      - data/processed/test.csv
+
+  train:
+    cmd: python scripts/train.py --params params.yaml
+    deps:
+      - scripts/train.py
+      - src/models/train.py
+      - src/models/architectures/
+      - src/data/dataset.py
+      - src/data/augmentation.py
+      - data/processed/train.csv
+      - data/processed/val.csv
+    params:
+      - params.yaml:
+          - base.random_seed
+          - data.num_classes
+          - preprocessing.image_size
+          - training.epochs
+          - training.batch_size
+          - training.mixed_precision
+          - training.early_stopping_patience
+          - training.gradient_clip
+          - optimizer.name
+          - optimizer.lr
+          - optimizer.weight_decay
+          - scheduler.name
+          - model.name
+          - model.pretrained
+          - model.dropout
+          - loss.alpha
+          - loss.gamma
+    outs:
+      - models/checkpoints/best_model.pt
+
+  evaluate:
+    cmd: >
+      python scripts/evaluate.py
+      --checkpoint models/checkpoints/best_model.pt
+      --params params.yaml
+      --metrics-out reports/metrics/test_metrics.json
+    deps:
+      - scripts/evaluate.py
+      - src/models/evaluate.py
+      - src/models/predict.py
+      - models/checkpoints/best_model.pt
+      - data/processed/test.csv
+    params:
+      - params.yaml:
+          - data.num_classes
+          - preprocessing.image_size
+          - model.name
+          - model.dropout
+          - inference.batch_size
+    metrics:
+      - reports/metrics/test_metrics.json:
+          cache: false

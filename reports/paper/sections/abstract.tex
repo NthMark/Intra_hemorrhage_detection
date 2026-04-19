@@ -1,0 +1,33 @@
+\begin{abstract}
+Intracranial hemorrhage (ICH) is a life-threatening neurological emergency
+in which blood accumulates within the cranial vault following traumatic
+injury or spontaneous vascular rupture.
+Rapid and accurate identification of the hemorrhage type on non-contrast
+head computed tomography (CT) is critical for treatment triage, yet
+radiologist availability and inter-reader variability remain bottlenecks
+in emergency settings.
+This paper presents a two-stage deep learning framework for the automatic
+detection and subtype classification of ICH across six categories:
+no hemorrhage, epidural, intraparenchymal, intraventricular, subarachnoid,
+and subdural.
+In Stage~1, an ensemble of three convolutional neural networks---DenseNet-121,
+DenseNet-169, and SE-ResNeXt-101---processes adjacent CT slices encoded as
+three-channel images after Hounsfield Unit windowing.
+The ensemble logits are averaged to produce robust per-slice predictions.
+In Stage~2, a bidirectional gated recurrent unit network with a
+parallel one-dimensional convolutional branch refines the per-slice
+predictions using inter-slice context within each CT study, additionally
+incorporating slice thickness as a metadata feature derived from the DICOM
+header.
+The complete system is trained and evaluated on the public CQ500 dataset
+comprising 491 CT studies with consensus radiologist labels.
+Experimental results demonstrate competitive performance across all six
+hemorrhage subtypes as measured by area under the receiver operating
+characteristic curve, sensitivity, and specificity with 95\% confidence
+intervals estimated via bootstrap resampling.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Intracranial hemorrhage, CT imaging, deep learning, DenseNet, SE-ResNeXt,
+bidirectional GRU, multi-label classification, RSNA 2019, CQ500
+\end{IEEEkeywords}

@@ -1,0 +1,79 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Intracranial hemorrhage (ICH) is among the most severe neurological
+emergencies, carrying a 30-day mortality rate of approximately
+40--50\,\% and leaving a large proportion of survivors with permanent
+disability~\cite{feigin2013global,lovelock2010incidence}.
+Rapid diagnosis is decisive: each hour of delayed treatment is
+associated with meaningfully worse functional outcomes, and the
+recommended window for administering reversal agents in anticoagulation-related
+ICH is under four hours from onset~\cite{hemphill2015ahaguideline}.
+Non-contrast head computed tomography (NCCT) is the clinical gold standard
+for initial ICH evaluation because of its availability, speed, and high
+sensitivity to acute blood~\cite{broderick2007ich}.
+Despite this, the interpretation of head CT scans requires specialist
+radiologist expertise that is unevenly distributed across
+institutions and time shifts, motivating automated decision-support systems
+that can flag suspicious scans and classify hemorrhage subtype.
+
+The 2019 RSNA Intracranial Hemorrhage Detection challenge~\cite{rsna2019}
+provided a large public benchmark---over 25\,000 CT studies labelled by
+a panel of radiologists---and catalysed rapid progress in deep learning for
+ICH detection.
+The first-place solution~\cite{wang2021deeplearning} demonstrated that a
+two-stage pipeline combining a per-slice convolutional neural network (CNN)
+with a study-level bidirectional recurrent sequence model outperforms
+single-image classifiers, because ICH often spans multiple adjacent slices
+and the inter-slice context carries diagnostic information not available from
+any single image alone.
+A subsequent systematic review~\cite{cho2021systematic} confirmed that
+ensemble methods and attention mechanisms consistently improve sensitivity
+and specificity across diverse ICH datasets.
+
+Building on these observations, this paper reimplements and extends the
+first-place RSNA 2019 pipeline on the publicly available CQ500
+dataset~\cite{chilamkurthy2018cq500}, which contains 491 CT studies
+with per-study consensus labels from three radiologists.
+Our contributions are:
+
+\begin{itemize}
+    \item A three-backbone ensemble (DenseNet-121, DenseNet-169,
+          SE-ResNeXt-101) for Stage-1 per-slice ICH classification with
+          six output classes, trained on three-channel adjacent-slice images
+          generated from CT windowing.
+    \item A Stage-2 bidirectional GRU sequence model that refines per-slice
+          predictions using intra-study context, augmented with the \emph{slice
+          thickness} DICOM metadata as an additional input channel---a
+          feature described in the original paper but absent from most
+          reproductions.
+    \item Bootstrap-based 95\,\% confidence interval estimation for all
+          reported AUC, sensitivity, and specificity values, enabling
+          statistically meaningful comparison with published benchmarks.
+    \item An open-source, reproducible codebase with a
+          complete DVC-managed data pipeline, MLflow experiment tracking,
+          and a REST inference API served in Docker.
+\end{itemize}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{../../reports/figures/gradcam.png}
+    \caption{Grad-CAM activation maps overlaid on CT slices for the
+             \emph{any hemorrhage} class after Stage-1 inference.
+             Warmer colours indicate regions most influential for the
+             positive prediction.  The model consistently attends to
+             hyperdense (bright) regions characteristic of acute blood.}
+    \label{fig:gradcam_overview}
+\end{figure}
+
+The remainder of this paper is organised as follows.
+Section~\ref{sec:related_work} reviews related work on deep learning for
+ICH and CT image analysis.
+Section~\ref{sec:methodology} describes the preprocessing pipeline,
+network architectures, and training procedure.
+Section~\ref{sec:experiments} details the experimental setup, dataset,
+and evaluation metrics.
+Section~\ref{sec:results} presents quantitative results and qualitative
+analysis.
+Section~\ref{sec:conclusion} concludes and outlines directions for
+future work.

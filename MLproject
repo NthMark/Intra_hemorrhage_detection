@@ -1,0 +1,29 @@
+name: ICH Detection
+conda_env: environment.yml
+
+entry_points:
+  prepare:
+    parameters:
+      params: {type: str, default: "params.yaml"}
+    command: "python scripts/prepare_data.py --params {params}"
+
+  train:
+    parameters:
+      params: {type: str, default: "params.yaml"}
+      model: {type: str, default: "efficientnet_b4"}
+      epochs: {type: int, default: 50}
+      batch_size: {type: int, default: 16}
+      lr: {type: float, default: 0.0001}
+    command: >
+      python scripts/train.py
+      --params {params}
+      --model {model}
+      --epochs {epochs}
+      --batch-size {batch_size}
+      --lr {lr}
+
+  evaluate:
+    parameters:
+      checkpoint: {type: str, default: "models/checkpoints/best_model.pt"}
+      params: {type: str, default: "params.yaml"}
+    command: "python scripts/evaluate.py --checkpoint {checkpoint} --params {params}"

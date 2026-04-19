@@ -1,0 +1,23 @@
+{
+  "macro_auc": NaN,
+  "macro_f1": 0.1830519695465078,
+  "subset_accuracy": 0.11666666666666667,
+  "auc_no_hemorrhage": 0.38580246913580246,
+  "sensitivity_no_hemorrhage": 0.9999999998148148,
+  "specificity_no_hemorrhage": 0.0,
+  "auc_epidural": NaN,
+  "sensitivity_epidural": 0.0,
+  "specificity_epidural": 0.9999999998333333,
+  "auc_intraparenchymal": 0.29320987654320985,
+  "sensitivity_intraparenchymal": 0.6666666655555555,
+  "specificity_intraparenchymal": 0.20370370366598078,
+  "auc_intraventricular": NaN,
+  "sensitivity_intraventricular": 0.0,
+  "specificity_intraventricular": 0.9999999998333333,
+  "auc_subarachnoid": 0.3888888888888889,
+  "sensitivity_subarachnoid": 0.0,
+  "specificity_subarachnoid": 0.9999999998148148,
+  "auc_subdural": NaN,
+  "sensitivity_subdural": 0.0,
+  "specificity_subdural": 0.5666666665722222
+}

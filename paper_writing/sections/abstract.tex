@@ -1,0 +1,27 @@
+\begin{abstract}
+% ── Instructions ─────────────────────────────────────────────────────────
+% IEEE conference: 150–250 words, single paragraph, no citations, no maths.
+% Cover: motivation, approach, key results, conclusions.
+% ─────────────────────────────────────────────────────────────────────────
+
+SLAM systems accumulate drift over long trajectories, degrading trajectory
+accuracy and map consistency---particularly for 2D LiDAR systems in
+featureless indoor environments. Infrastructure-assisted approaches typically
+register fixed cameras onto a pre-built SLAM map, so any drift in that map
+biases subsequent camera poses. This paper presents a method that jointly
+estimates the environment map and the poses of ceiling-mounted cameras,
+enabling cameras to act as global anchors without a separate registration
+stage. When a camera observes the robot, a visual constraint is inserted into
+the pose graph, tying the robot trajectory to the camera's map-frame location.
+Unlike loop closure alone, these repeated absolute constraints suppress drift
+in visually ambiguous and revisited areas. The approach integrates into a
+graph-based SLAM backend via pose-graph optimisation with no modifications
+to the core pipeline. Experiments in simulated indoor environments demonstrate
+improved map consistency and reduced absolute trajectory error compared with a
+LiDAR-only baseline, at modest additional computational cost.
+
+\end{abstract}
+
+\begin{IEEEkeywords}
+SLAM, visual constraints, pose-graph optimisation, fixed cameras
+\end{IEEEkeywords}

@@ -1,0 +1,85 @@
+% ── Appendix ───────────────────────────────────────────────────────────────
+\appendices
+\section{Author Contributions}
+
+The project was divided into three pipeline stages, each owned by one team
+member. Table~\ref{tab:contributions} summarises the primary files and
+responsibilities; narrative details follow.
+
+\begin{table}[h]
+\centering
+\caption{Team member ownership by pipeline stage.}
+\label{tab:contributions}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{} l l @{}}
+\toprule
+\textbf{Member} & \textbf{Stage} \\
+\midrule
+My Nguyen Tra       & Data \& Preprocessing \\
+Long Trinh Le Hoang & Stage 1: CNN Training \\
+Hao Nguyen Thien    & Stage 2: Sequence Model \& Deployment \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{My Nguyen Tra — Data \& Preprocessing}
+
+My Nguyen Tra was responsible for everything from raw DICOM files to
+model-ready tensors. Her tasks included:
+\begin{itemize}
+    \item Extraction of CQ500 archives and verification of DICOM file integrity.
+    \item Label generation from \texttt{reads.csv} via majority vote
+          ($\geq$\,2/3 readers) and broadcast of study-level labels to
+          every slice.
+    \item Stratified train/val/test splitting (70/15/15) across 491
+          studies, preserving subtype proportions in each split.
+    \item HU preprocessing pipeline: \texttt{RescaleSlope}/\texttt{RescaleIntercept}
+          conversion, clipping to [$-$1000, 3000]\,HU, brain-window
+          stacking of three adjacent slices $(s-1,\,s,\,s+1)$ as a
+          3-channel float32 image.
+    \item Augmentation pipeline (\texttt{HFlip}, \texttt{ShiftScaleRotate},
+          \texttt{RandomErase}, \texttt{RandomCrop} for training;
+          centre crop for validation).
+    \item Study-based \texttt{ICHStudyDataset} with centre-weighted
+          slice sampling and class-imbalance analysis
+          (\texttt{pos\_weight} per class).
+\end{itemize}
+
+\subsection*{Long Trinh Le Hoang — Stage 1: CNN Training}
+
+Long Trinh Le Hoang owned the CNN backbone, training loop, scheduler,
+and evaluation framework. His tasks included:
+\begin{itemize}
+    \item Implementation of \texttt{DenseNet121ICH} and
+          \texttt{DenseNet169ICH} backbones with an
+          \texttt{AdaptiveAvgPool2d(1)} head and a \texttt{get\_features()}
+          method for downstream feature extraction.
+    \item \texttt{BCEWithLogitsLoss} with per-class \texttt{pos\_weight}
+          as the primary loss; Adam optimiser
+          (lr\,=\,5$\times 10^{-4}$, weight\_decay\,=\,2$\times 10^{-5}$).
+    \item WarmRestart cosine-annealing scheduler (SGDR):
+          10-epoch warmup plateau followed by \texttt{T\_mult=2} cycles.
+    \item Mixed-precision training (AMP), gradient clipping, MLflow
+          experiment tracking, early stopping, and checkpoint saving.
+    \item Per-class AUC, macro-AUC, sensitivity and specificity metrics
+          with bootstrap 95\,\% confidence intervals.
+\end{itemize}
+
+\subsection*{Hao Nguyen Thien — Stage 2: Sequence Model \& Deployment}
+
+Hao Nguyen Thien owned the BiGRU sequence model and the Docker-based
+inference API. His tasks included:
+\begin{itemize}
+    \item Feature extraction script to convert Stage-1 logits into
+          per-study \texttt{.pt} files consumed by Stage 2.
+    \item Two-sub-network BiGRU architecture: SM1 (FC\,+\,BiGRU) and
+          SM2 (dilated Conv1D\,+\,BiGRU with skip connection), summed
+          to produce refined per-slice logits.
+    \item Stage-2 training with Adam\,+\,CosineAnnealingLR for 40 epochs.
+    \item Grad-CAM saliency visualisation pipeline
+          (\texttt{reports/figures/gradcam.png}).
+    \item FastAPI \texttt{/api/v1/predict} endpoint accepting DICOM
+          uploads and returning per-class probabilities.
+    \item Multi-stage Docker build (\texttt{make serve-docker}) enabling
+          full inference with no local Python installation.
+\end{itemize}

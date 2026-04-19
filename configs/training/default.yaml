@@ -1,0 +1,10 @@
+experiment: default
+epochs: 50
+batch_size: 16
+lr: 1.0e-4
+weight_decay: 1.0e-5
+dropout: 0.3
+image_size: 512
+model: efficientnet_b4
+loss: focal_loss
+scheduler: cosine_annealing_warm_restarts

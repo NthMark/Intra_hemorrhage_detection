@@ -1,0 +1,275 @@
+\section{Methodology}
+\label{sec:methodology}
+
+\subsection{Notation}
+
+Let $\mathcal{S} = \{s_1, s_2, \ldots, s_T\}$ denote an ordered sequence
+of axial CT slices comprising one CT study, where $T$ is the number of
+slices and varies across studies.
+Each slice $s_t$ is associated with a ground-truth label vector
+$\mathbf{y}_t \in \{0,1\}^C$ with $C=6$ hemorrhage classes.
+The per-slice score predicted by the Stage-1 CNN ensemble is denoted
+$\hat{\mathbf{p}}_t^{(1)} \in [0,1]^C$, and the refined score produced by
+the Stage-2 sequence model is $\hat{\mathbf{p}}_t^{(2)} \in [0,1]^C$.
+We use $\boldsymbol{\ell}_t^{(1)} \in \mathbb{R}^C$ for the pre-sigmoid
+logits from Stage~1.
+
+\subsection{Dataset}
+
+We use the CQ500 dataset~\cite{chilamkurthy2018cq500}, which contains
+491 de-identified non-contrast head CT studies collected from emergency
+departments in India.
+Each study was independently labelled by three board-certified neuroradiologists
+across six binary findings: \emph{any intracranial hemorrhage} (used to derive
+the \emph{no hemorrhage} class), \emph{epidural}, \emph{intraparenchymal},
+\emph{intraventricular}, \emph{subarachnoid}, and \emph{subdural} hemorrhage.
+Following the procedure of~\cite{wang2021deeplearning}, a majority vote
+(at least 2 out of 3 readers) is used to assign the final study-level label.
+
+Labels are propagated to the slice level: all slices in a study inherit the
+study-level multi-hot label vector.
+This is an intentional approximation---normal slices in a positive study
+receive the same label as pathological ones---which is consistent with the
+original challenge formulation~\cite{rsna2019} and simplifies the slice-level
+loss computation.
+After DICOM extraction, the full dataset yields approximately
+\num{171000} labelled slices.
+We split studies (not slices) into training, validation, and test sets in a
+$70/15/15$ ratio with stratification on \emph{any intracranial hemorrhage},
+giving $\approx\num{119800}$ training slices,
+$\approx\num{25700}$ validation slices, and
+$\approx\num{25700}$ test slices.
+
+\subsection{Preprocessing Pipeline}
+\label{sec:preprocessing}
+
+\paragraph{DICOM to Hounsfield Units.}
+Raw DICOM pixel values $p$ are converted to Hounsfield Units using the
+linear rescaling parameters stored in the DICOM header:
+
+\begin{equation}
+    v_{\HU} = p \cdot \mathrm{RescaleSlope} + \mathrm{RescaleIntercept}.
+    \label{eq:hu_conversion}
+\end{equation}
+
+Values are subsequently clipped to $[-1000,\, 3000]\,\HU$ to discard
+out-of-body and implant artefacts.
+
+\paragraph{CT Windowing.}
+Three diagnostic windows are applied to map the clipped HU values onto
+three independent $[0,\,1]$ channels:
+
+\begin{itemize}
+    \item \textbf{Brain window}: centre $= 40\,\HU$, width $= 80\,\HU$
+          (optimised for grey/white matter contrast).
+    \item \textbf{Subdural window}: centre $= 75\,\HU$, width $= 215\,\HU$
+          (optimised for subdural collections).
+    \item \textbf{Bone window}: centre $= 600\,\HU$, width $= 2800\,\HU$
+          (optimised for skull fractures and calcifications).
+\end{itemize}
+
+For window centre $w_c$ and width $w_w$, the normalised value of a
+pixel with Hounsfield Unit $v$ is
+
+\begin{equation}
+    f(v;\,w_c,\,w_w) =
+        \mathrm{clip}\!\left(\frac{v - w_c + w_w/2}{w_w},\;0,\;1\right).
+    \label{eq:windowing}
+\end{equation}
+
+The three resulting single-channel maps are stacked into a
+$3 \times H \times W$ tensor, enabling ImageNet-pretrained RGB networks
+to process CT data without architectural modification.
+This three-window strategy was first proposed by
+Sage and Badura~\cite{sage2020doublebranch} and subsequently adopted
+by Wang et al.~\cite{wang2021deeplearning}.
+All images are resized to $384 \times 384$ pixels using bilinear
+interpolation and channel-wise normalised with ImageNet statistics
+($\mu = [0.485, 0.456, 0.406]$,
+$\sigma = [0.229, 0.224, 0.225]$).
+
+\paragraph{Remark on Adjacent-Slice Context.}
+An alternative 3-channel strategy stacks three consecutive slices
+$(s_{t-1}, s_t, s_{t+1})$ as colour channels (\emph{adjacent-slice
+stacking}), used as Branch~\#2 in~\cite{sage2020doublebranch}.
+Following the recommendation of Wang et al.~\cite{wang2021deeplearning},
+we adopt the three-window approach in Stage~1 because it encodes richer
+per-slice tissue contrast, while inter-slice spatial context is already
+captured more effectively by the BiGRU sequence model in Stage~2.
+
+\subsection{Stage 1: Per-Slice CNN Ensemble}
+\label{sec:stage1}
+
+\subsubsection{Backbones}
+
+Three architectures form the ensemble:
+
+\begin{enumerate}
+    \item \textbf{DenseNet-121}~\cite{huang2017densely}: dense block
+          feature maps fed into an adaptive average-pooling head followed
+          by a single linear classifier.
+          Feature dimension: 1024; final layer: $\mathrm{Linear}(1024, 6)$.
+    \item \textbf{DenseNet-169}~\cite{huang2017densely}: identical structure
+          with a wider final feature map.
+          Feature dimension: 1664; final layer: $\mathrm{Linear}(1664, 6)$.
+    \item \textbf{SE-ResNeXt-101-32$\times$4d}~\cite{hu2018squeeze}: a
+          ResNeXt backbone augmented with squeeze-and-excitation channel
+          attention, using \texttt{AdaptiveConcatPool2d} (concatenation of
+          global average and global max pooling) in the head.
+          Feature dimension: $2 \times 2048 = 4096$; classification head:
+          $\mathrm{BN} \to \mathrm{Dropout}(0.5) \to \mathrm{Linear}(4096, 512)
+          \to \mathrm{ReLU} \to \mathrm{BN} \to \mathrm{Dropout}(0.5) \to
+          \mathrm{Linear}(512, 6)$.
+\end{enumerate}
+
+Each backbone is pretrained on ImageNet-1K.
+The three-channel adjacent-slice input is fed to all backbones without
+any architectural change to the first convolutional layer (the pretrained
+weights are inherited directly).
+
+\subsubsection{Ensemble Averaging}
+
+Given backbone logits $\boldsymbol{\ell}_t^{(k)}$ for model $k \in \{1,2,3\}$,
+the ensemble prediction is the arithmetic mean over sigmoid-transformed logits:
+
+\begin{equation}
+    \hat{\mathbf{p}}_t^{(1)} =
+        \frac{1}{K} \sum_{k=1}^{K} \sigma\!\left(\boldsymbol{\ell}_t^{(k)}\right),
+    \quad K = 3,
+    \label{eq:ensemble}
+\end{equation}
+
+where $\sigma(\cdot)$ denotes the element-wise sigmoid function.
+The logit-level ensemble average is equivalently computed as
+$\boldsymbol{\ell}_t^{(1)} = \frac{1}{K} \sum_k \boldsymbol{\ell}_t^{(k)}$
+and passed as input to Stage~2.
+
+\subsection{Stage 2: Bidirectional GRU Sequence Model}
+\label{sec:stage2}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{../../reports/figures/gradcam_iph.png}
+    \caption{Grad-CAM activation maps for the \emph{intraparenchymal
+             hemorrhage} class.  Stage-1 activations concentrate on the
+             hyperdense intraparenchymal region; Stage-2 context propagation
+             further sharpens the decision boundary at adjacent slices.}
+    \label{fig:gradcam_iph}
+\end{figure}
+
+The sequence model operates on the logit sequences
+$\{\boldsymbol{\ell}_t^{(1)}\}_{t=1}^{T}$ output by the Stage-1 ensemble for all
+slices of one CT study, and optionally on the slice thickness
+$\delta_t \in \mathbb{R}$ extracted from the DICOM \texttt{SliceThickness}
+tag.
+Two parallel sub-networks are combined.
+
+\subsubsection{Sequence sub-network 1 (SM1): FC + BiGRU}
+
+A shared linear projection compresses each per-slice logit vector:
+\begin{align}
+    \mathbf{h}_t^{\mathrm{fc}} &= \mathrm{ReLU}\!\left(
+        W_2\, \mathrm{BN}\!\left(W_1 \boldsymbol{\ell}_t^{(1)}\right)\right)
+    \in \mathbb{R}^{32}.
+    \label{eq:sm1_fc}
+\end{align}
+
+The sequence $\{\mathbf{h}_t^{\mathrm{fc}}\}$ is then processed by a
+two-layer bidirectional GRU with hidden size $d = 96$:
+\begin{align}
+    \overrightarrow{\mathbf{g}}_t,\, \overleftarrow{\mathbf{g}}_t
+        &= \mathrm{BiGRU}\!\left(\mathbf{h}_t^{\mathrm{fc}}\right),
+    \label{eq:sm1_gru}
+\end{align}
+
+and the concatenated hidden state
+$[\overrightarrow{\mathbf{g}}_t;\, \overleftarrow{\mathbf{g}}_t] \in \mathbb{R}^{2d}$
+is projected to per-slice logits by a linear layer:
+$\boldsymbol{\ell}_t^{\mathrm{SM1}} = W_3 [\overrightarrow{\mathbf{g}}_t;\, \overleftarrow{\mathbf{g}}_t]
+\in \mathbb{R}^C$.
+
+\subsubsection{Sequence sub-network 2 (SM2): Conv1D + BiGRU with skip}
+
+SM2 concatenates the raw logits with the sigmoid predictions from SM1 and,
+when available, the normalised slice thickness:
+
+\begin{equation}
+    \mathbf{u}_t = \left[\boldsymbol{\ell}_t^{(1)};\;
+                         \sigma\!\left(\boldsymbol{\ell}_t^{\mathrm{SM1}}\right);\;
+                         \delta_t / \delta_{\max}\right]
+    \in \mathbb{R}^{2C+1},
+    \label{eq:sm2_input}
+\end{equation}
+
+where $\delta_{\max} = 10\,\mathrm{mm}$ is a normalisation constant.
+The sequence $\{\mathbf{u}_t\}$ is transposed to channel-first format
+$U \in \mathbb{R}^{(2C+1) \times T}$ and processed by a stack of dilated
+one-dimensional convolutions:
+\begin{align}
+    F_1 &= \mathrm{Conv1d}_{k=5,\,d=1}(U), \nonumber \\
+    F_2 &= F_1 + \mathrm{Conv1d}_{k=3,\,d=4}\!\bigl(
+               \mathrm{Conv1d}_{k=3,\,d=2}(F_1)\bigr),
+    \label{eq:sm2_convs}
+\end{align}
+
+where $k$ and $d$ denote kernel size and dilation respectively.
+$F_2$ is fed into a second BiGRU, whose output is summed with a pointwise
+projection of $F_2$ (skip connection), and projected to per-slice logits
+$\boldsymbol{\ell}_t^{\mathrm{SM2}} \in \mathbb{R}^C$.
+
+The final Stage-2 output is the element-wise sum of both sub-networks:
+\begin{equation}
+    \boldsymbol{\ell}_t^{(2)} =
+        \boldsymbol{\ell}_t^{\mathrm{SM1}} + \boldsymbol{\ell}_t^{\mathrm{SM2}}.
+    \label{eq:stage2_out}
+\end{equation}
+
+\subsection{Loss Function and Class Imbalance}
+\label{sec:loss}
+
+Multi-label classification is framed as $C$ independent binary problems.
+We use binary cross-entropy with logits, summed over classes and averaged
+over the mini-batch:
+
+\begin{align}
+    \BCE = -\frac{1}{BC} \sum_{b=1}^{B} \sum_{c=1}^{C}
+        &\Bigl[ w_c \, y_{b,c} \log \hat{p}_{b,c} \nonumber \\
+        &\quad + (1 - y_{b,c}) \log (1 - \hat{p}_{b,c}) \Bigr],
+    \label{eq:bce}
+\end{align}
+
+where $B$ is the batch size, $y_{b,c} \in \{0,1\}$ is the ground-truth
+label, $\hat{p}_{b,c} = \sigma(\ell_{b,c})$ is the predicted probability,
+and $w_c \geq 1$ is the positive class weight for class $c$, computed as
+the ratio of negative to positive examples in the training set.
+This formulation is equivalent to PyTorch's
+\texttt{BCEWithLogitsLoss(pos\_weight=...)} and directly addresses the
+severe class imbalance present in CQ500 (e.g.,
+epidural hemorrhage prevalence $< 5\,\%$).
+
+\subsection{Training Protocol}
+\label{sec:training}
+
+All Stage-1 backbone networks are fine-tuned end-to-end from ImageNet
+pretrained weights.
+We adopt the training protocol of~\cite{wang2021deeplearning}:
+\begin{itemize}
+    \item \textbf{Optimiser}: Adam~\cite{kingma2015adam} with learning rate
+          $\eta = 5 \times 10^{-4}$, weight decay $\lambda = 2 \times 10^{-5}$,
+          and $\epsilon = 10^{-8}$.
+    \item \textbf{Scheduler}: Warm-restart cosine annealing (SGDR)
+          ~\cite{loshchilov2017sgdr} with initial period $T_{\max} = 5$ epochs
+          and $\eta_{\min} = 10^{-5}$.
+    \item \textbf{Duration}: 80 epochs with early stopping patience of 20
+          epochs, monitoring validation macro-AUC.
+    \item \textbf{Input}: Three-channel adjacent-slice images at
+          $384 \times 384$ pixels.
+    \item \textbf{Batch size}: 16 samples; mixed-precision (FP16) training.
+\end{itemize}
+
+Data augmentation during Stage-1 training comprises random horizontal
+flipping, random rotation up to $\pm 15^{\circ}$, grid-shuffle, and
+brightness/contrast jitter, following the protocol of the original
+solution.
+Stage-2 is trained for 40 epochs with Adam ($\eta = 10^{-3}$) and cosine
+annealing, using the frozen Stage-1 logits extracted over the training set.

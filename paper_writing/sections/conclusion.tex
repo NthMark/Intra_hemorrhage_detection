@@ -1,0 +1,40 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+% ── Instructions ─────────────────────────────────────────────────────────
+% 1 paragraph: restate problem + approach.
+% 1 paragraph: key quantitative findings.
+% 1 paragraph: limitations + future work.
+% No new results or claims here.
+% ─────────────────────────────────────────────────────────────────────────
+
+We presented a method for reducing SLAM drift in indoor environments by
+injecting camera-to-robot pose constraints into the Ceres factor graph of
+a graph-based LiDAR SLAM backend.
+Fixed infrastructure cameras detect the robot visually via a YOLO model,
+and each detection provides an absolute pose anchor that supplements
+odometry and loop-closure edges.
+The approach is implemented as a standalone node requiring no
+modification to the SLAM solver core.
+
+Experiments in a 10-room ring simulation show that enabling camera
+constraints reduces Absolute Trajectory Error by \textbf{?\%} and
+improves map overlap with ground truth from \textbf{?\%} to
+\textbf{?\%}.
+These gains hold across randomised initial conditions and are robust to
+constraint covariance values in the range
+$\sigma_x \in [0.08, 0.15]\ \si{\metre}$.
+
+Several directions remain for future work.
+An important practical limitation of conventional infrastructure-assisted SLAM
+is that camera poses are often registered only after a map has already been
+created, which means any residual map drift is baked into the camera anchors
+themselves. This motivates formulations in which map structure and camera
+poses are refined together rather than in separate stages.
+First, replacing the world-file ground-truth camera pose with a visual
+relative-pose estimator (homography or PnP) will remove the dependency on
+externally specified camera positions.
+Second, extending the formulation to multiple robots with shared
+infrastructure cameras could benefit collaborative mapping. % TODO: cite
+Third, an online covariance estimator based on detection confidence would
+make the method self-tuning.

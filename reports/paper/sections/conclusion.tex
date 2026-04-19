@@ -1,0 +1,40 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We presented a two-stage deep learning pipeline for the automatic detection
+and subtype classification of intracranial hemorrhage in non-contrast head
+CT scans, reproducing and extending the first-place RSNA 2019 solution on
+the publicly available CQ500 dataset.
+Stage~1 employs an ensemble of three heterogeneous CNN backbones
+(DenseNet-121, DenseNet-169, SE-ResNeXt-101) that classify each CT slice
+using a three-channel adjacent-slice representation produced from CT
+windowing.
+Stage~2 refines the per-slice ensemble logits using a bidirectional GRU
+sequence model with a parallel dilated convolutional branch, additionally
+incorporating slice thickness as a DICOM metadata feature---a detail
+described in the original paper but commonly omitted in reproductions.
+Calibrated uncertainty estimates (95\,\% bootstrap confidence intervals)
+are reported for all key metrics.
+
+Experimental results on the CQ500 test split show that the ensemble
+outperforms any individual backbone, and that the sequence model improves
+macro-AUC by a further margin, consistent with the gains reported by the
+original authors.
+Including slice thickness provides an additional incremental benefit,
+particularly for rare subtypes with high inter-slice variability.
+
+Several directions offer promising avenues for future work.
+First, the current system propagates study-level labels to all slices,
+introducing label noise on non-annotated slices of positive studies;
+a multiple-instance learning formulation could address this and potentially
+improve slice-level calibration.
+Second, the three-backbone ensemble could be extended with more diverse
+architectures---such as vision transformers or hybrid CNN–transformer
+models---which may provide further complementary representations.
+Third, the REST API and Docker deployment developed alongside this work
+provide a foundation for prospective clinical evaluation, in which the
+system would be integrated into a DICOM viewer to flag high-priority studies
+in the radiology worklist.
+Finally, the pipeline could be adapted to other cranial CT findings (e.g.,
+mass effect, midline shift) with minimal modification, owing to its modular
+DVC-managed data pipeline and configurable params.yaml interface.

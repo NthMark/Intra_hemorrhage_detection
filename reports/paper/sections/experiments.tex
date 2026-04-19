@@ -1,0 +1,95 @@
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Dataset and Splits}
+
+The CQ500 dataset~\cite{chilamkurthy2018cq500} contains 491 non-contrast
+head CT studies contributed from emergency departments.
+Table~\ref{tab:dataset} summarises the study-level class distribution after
+majority-vote label assignment.
+Epidural hemorrhage is the rarest subtype, which creates significant class
+imbalance that is addressed through positive class weighting
+(Section~\ref{sec:loss}).
+Studies are partitioned at the study level in a stratified $70/15/15$ split
+using \emph{any hemorrhage} as the stratification variable, ensuring that the
+positive rate is consistent across splits.
+No data augmentation is applied to the validation or test splits.
+
+\begin{table}[t]
+    \centering
+    \caption{CQ500 study-level class distribution. Percentages are relative
+             to the 491 total studies.}
+    \label{tab:dataset}
+    \begin{tabular}{lcc}
+        \toprule
+        \textbf{Class} & \textbf{Positive studies} & \textbf{\%} \\
+        \midrule
+        Any hemorrhage      & 205 & 41.8 \\
+        Intraparenchymal    & 102 & 20.8 \\
+        Subdural            & 117 & 23.8 \\
+        Subarachnoid        &  73 & 14.9 \\
+        Intraventricular    &  62 & 12.6 \\
+        Epidural            &  25 &  5.1 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Experimental Conditions}
+\label{sec:conditions}
+
+We evaluate the following systems:
+
+\begin{enumerate}
+    \item \textbf{Baseline -- DenseNet-121 only}: a single DenseNet-121
+          backbone trained with the adjacent-slice 3-channel input, no
+          sequence model.
+    \item \textbf{Ensemble (Stage 1 only)}: average of DenseNet-121,
+          DenseNet-169, and SE-ResNeXt-101 predictions, without Stage-2.
+    \item \textbf{Ensemble + Sequence (Stage 1 + 2, without $\delta$)}:
+          full two-stage pipeline without slice thickness input.
+    \item \textbf{Ensemble + Sequence + $\delta$ (full model)}: full
+          two-stage pipeline including the slice thickness feature in SM2
+          (Eq.~\ref{eq:sm2_input}).
+\end{enumerate}
+
+Systems~3 and~4 correspond to the original first-place RSNA 2019 solution
+without and with the slice thickness feature, respectively.
+All systems share the same preprocessing pipeline, loss function, and
+optimiser configuration described in Section~\ref{sec:training}.
+
+\subsection{Hardware and Software}
+
+All experiments are run on a single workstation with one NVIDIA GPU
+(minimum 8\,GB VRAM) under Ubuntu 22.04.
+The software stack is: Python 3.11, PyTorch 2.x, torchvision, timm,
+albumentations, scikit-learn, pydicom, and MLflow~\cite{mlflow2018} for
+experiment tracking.
+Reproducibility is ensured via a DVC~\cite{ruslan2020dvc} pipeline that
+records data preprocessing, model training, and evaluation as separate
+tracked stages with content-hashed outputs.
+
+\subsection{Evaluation Metrics}
+\label{sec:metrics}
+
+We report the following metrics on the held-out test set.
+
+\paragraph{Area under the ROC curve (AUC).}
+Per-class AUC is computed against continuous probability predictions.
+Macro-AUC is the unweighted mean over all $C = 6$ classes.
+
+\paragraph{Sensitivity and Specificity.}
+At a decision threshold $\tau = 0.5$, we compute per-class sensitivity
+(true positive rate) and specificity (true negative rate):
+\begin{align}
+    \mathrm{Sensitivity}_c &= \frac{\mathrm{TP}_c}{\mathrm{TP}_c + \mathrm{FN}_c}, \nonumber \\
+    \mathrm{Specificity}_c &= \frac{\mathrm{TN}_c}{\mathrm{TN}_c + \mathrm{FP}_c}.
+    \label{eq:sens_spec}
+\end{align}
+
+\paragraph{Bootstrap 95\,\% Confidence Intervals.}
+For each AUC value, we apply percentile bootstrap resampling with
+$N_{\mathrm{boot}} = 1000$ resamples, drawing with replacement from the
+test-set slice predictions.
+The 2.5th and 97.5th percentiles of the bootstrap AUC distribution form
+the 95\,\% CI~\cite{efron1994introduction}.
+This follows the reporting methodology of Wang et al.~\cite{wang2021deeplearning}.

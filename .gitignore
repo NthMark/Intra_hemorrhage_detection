@@ -1,0 +1,80 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.installed.cfg
+lib/
+lib64/
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+.env
+.venv
+env/
+venv/
+ENV/
+
+# ── Jupyter ───────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ── Data (large binary files tracked by DVC, not git) ────────────────────────
+dataset/
+data/raw/
+data/processed/
+data/interim/
+data/external/
+
+# ── Model weights (tracked by DVC or git-lfs) ─────────────────────────────────
+models/checkpoints/
+models/production/
+*.pt
+*.pth
+*.onnx
+
+# ── MLflow artifacts ──────────────────────────────────────────────────────────
+mlruns/
+mlruns.
+mlruns.db
+mlflow.db
+mlartifacts/
+
+# ── Reports & figures ─────────────────────────────────────────────────────────
+reports/figures/
+reports/metrics/paper_writing/build/
+
+# ── Reference code (cloned external repo — link in README) ───────────────────
+reference_code/
+
+# ── Stray files ───────────────────────────────────────────────────────────────
+=*
+# ── Testing & coverage ────────────────────────────────────────────────────────
+.pytest_cache/
+htmlcov/
+coverage.xml
+.coverage
+
+# ── Linting ───────────────────────────────────────────────────────────────────
+.ruff_cache/
+.mypy_cache/
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Secrets / credentials – NEVER commit these ───────────────────────────────
+.env.local
+.env.*.local
+secrets.yaml
+credentials.json

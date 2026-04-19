@@ -1,0 +1,5 @@
+data/raw/
+data/processed/
+models/checkpoints/
+models/production/
+mlruns/

@@ -1,0 +1,103 @@
+\section{Related Work}
+\label{sec:related_work}
+
+\subsection{Deep Learning for CT Image Analysis}
+
+Convolutional neural networks have rapidly become the dominant approach
+for classification tasks on medical images.
+Early work adapting ImageNet-pretrained architectures to CT slice
+classification showed that transfer learning is effective despite the
+domain gap between natural images and greyscale CT
+slices~\cite{shin2016deeplearning,tajbakhsh2016convolutional}.
+The key insight enabling effective transfer is the conversion of CT
+Hounsfield Units to a pseudo-RGB representation via multiple windowing
+presets---a technique that maps different tissue contrast ranges into
+separate colour channels and has since become standard practice for CT
+classification~\cite{chilamkurthy2018cq500,wang2021deeplearning}.
+
+\subsection{Intracranial Hemorrhage Detection}
+
+Chilamkurthy et al.~\cite{chilamkurthy2018cq500} were among the first to
+demonstrate that deep learning at the study level can match or exceed
+radiologist performance on several types of critical brain findings on
+NCCT, releasing the CQ500 dataset used in this work.
+Subsequent methods have explored diverse architectural choices, including
+attention gates~\cite{schlemper2019attention}, squeeze-and-excitation
+blocks~\cite{hu2018squeeze}, and multi-scale feature fusion
+strategies~\cite{ye2019hemorrhage}.
+
+Sage and Badura~\cite{sage2020doublebranch} proposed a double-branch
+ResNet-50 framework that combines two complementary 3-channel RGB
+representations of each CT slice: Branch~\#1 stacks the brain, subdural,
+and bone windowed images of the same slice as three colour channels,
+while Branch~\#2 stacks three consecutive slices $(s_{t-1}, s_t, s_{t+1})$
+all in the subdural window to capture local spatial context.
+Features from both branches are concatenated and passed to an external
+classifier (SVM or Random Forest), with the random forest variant
+achieving F1 scores of 89.1\%, 72.7\%, 93.1\%, 96.6\%, and 89.9\%
+for SDH, EDH, IPH, IVH, and SAH respectively.
+Their work highlights that multi-window intensity representations and
+adjacent-slice spatial context are complementary rather than
+mutually exclusive, motivating the use of the three-window approach
+in our Stage-1 CNN preprocessing.
+
+The 2019 RSNA Intracranial Hemorrhage Detection
+challenge~\cite{rsna2019} marked a turning point.
+Wang et al.~\cite{wang2021deeplearning} describe the winning two-stage
+pipeline: an ensemble of three independently trained slice-level CNNs
+(DenseNet-121, DenseNet-169, SE-ResNeXt-101) followed by a bidirectional
+GRU that processes the per-slice logit sequences within each CT study.
+This architecture directly inspired the present work.
+Importantly, the original paper reports that study-level AUC improves by
+1--3 percentage points when the sequence model is added, and by a further
+margin when slice thickness is included as a contextual cue.
+
+A subsequent systematic review by Cho et al.~\cite{cho2021systematic}
+examined over 60 deep learning methods for ICH detection and classification,
+concluding that (i) ensemble models consistently outperform single networks,
+(ii) sequence modelling of scan-level context is beneficial but
+underexplored in the literature, and (iii) few works report confidence
+intervals, making cross-study comparisons unreliable.
+Our work directly addresses points (ii) and (iii).
+
+\subsection{Sequence Models for Medical Imaging}
+
+Recurrent neural networks and their gated variants were first applied to
+medical imaging for video-based echocardiography
+analysis~\cite{ouyang2020video} and for predicting prognosis from
+longitudinal imaging series.
+For CT-based pathology, the key challenge is that a single CT study
+comprises a variable-length ordered sequence of axial slices
+(typically 20--60 for brain protocols), and the number of positive slices
+is often small and concentrated around the lesion.
+The LSTM-based sequence model of~\cite{ye2019hemorrhage} demonstrated
+that aggregating slice-level features improves sensitivity for small
+hemorrhages such as intraventricular bleeds.
+
+Bidirectional GRUs have become a preferred recurrent layer because they
+propagate context in both the superior-to-inferior and inferior-to-superior
+directions simultaneously, which is important when the hemorrhage boundary
+is ambiguous at slice boundaries~\cite{wang2021deeplearning}.
+Our Stage-2 model follows this design and additionally conditions on slice
+thickness to account for the fact that thicker slices cover more anatomy
+per frame and therefore have different inter-slice correlation
+characteristics.
+
+\subsection{Ensemble Methods and Uncertainty Quantification}
+
+Multi-model ensembling by probability averaging is a well-established
+approach for reducing prediction variance in deep learning
+classifiers~\cite{lakshminarayanan2017simple}.
+In the medical imaging context, ensemble averaging of backbone CNNs trained
+with different architectures provides complementary feature representations
+and has been the dominant strategy in top-performing challenge
+submissions~\cite{wang2021deeplearning,rsna2019}.
+
+Uncertainty quantification through bootstrap confidence intervals is
+recommended by clinical AI evaluation
+guidelines~\cite{topol2019highperformance} and by reporting standards such
+as TRIPOD~\cite{moons2015tripod}.
+Despite this, the majority of published ICH detection papers report only
+point-estimate AUC values~\cite{cho2021systematic}.
+Our implementation computes 95\,\% bootstrap CIs for all reported AUC,
+sensitivity, and specificity metrics.

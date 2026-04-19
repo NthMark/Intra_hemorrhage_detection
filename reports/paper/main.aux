@@ -1,0 +1,168 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{feigin2013global,lovelock2010incidence}
+\citation{hemphill2015ahaguideline}
+\citation{broderick2007ich}
+\citation{rsna2019}
+\citation{wang2021deeplearning}
+\citation{cho2021systematic}
+\citation{chilamkurthy2018cq500}
+\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{sec:introduction}{{I}{1}{Introduction}{section.1}{}}
+\citation{shin2016deeplearning,tajbakhsh2016convolutional}
+\citation{chilamkurthy2018cq500,wang2021deeplearning}
+\citation{chilamkurthy2018cq500}
+\citation{schlemper2019attention}
+\citation{hu2018squeeze}
+\citation{ye2019hemorrhage}
+\citation{sage2020doublebranch}
+\citation{rsna2019}
+\citation{wang2021deeplearning}
+\citation{cho2021systematic}
+\citation{ouyang2020video}
+\citation{ye2019hemorrhage}
+\citation{wang2021deeplearning}
+\citation{lakshminarayanan2017simple}
+\citation{wang2021deeplearning,rsna2019}
+\citation{topol2019highperformance}
+\citation{moons2015tripod}
+\citation{cho2021systematic}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Grad-CAM activation maps overlaid on CT slices for the \emph  {any hemorrhage} class after Stage-1 inference. Warmer colours indicate regions most influential for the positive prediction. The model consistently attends to hyperdense (bright) regions characteristic of acute blood.\relax }}{2}{figure.caption.1}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:gradcam_overview}{{1}{2}{Grad-CAM activation maps overlaid on CT slices for the \emph {any hemorrhage} class after Stage-1 inference. Warmer colours indicate regions most influential for the positive prediction. The model consistently attends to hyperdense (bright) regions characteristic of acute blood.\relax }{figure.caption.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{2}{section.2}\protected@file@percent }
+\newlabel{sec:related_work}{{II}{2}{Related Work}{section.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Deep Learning for CT Image Analysis}{2}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}Intracranial Hemorrhage Detection}{2}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-C}}Sequence Models for Medical Imaging}{2}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-D}}Ensemble Methods and Uncertainty Quantification}{2}{subsection.2.4}\protected@file@percent }
+\citation{chilamkurthy2018cq500}
+\citation{wang2021deeplearning}
+\citation{rsna2019}
+\citation{sage2020doublebranch}
+\citation{wang2021deeplearning}
+\citation{sage2020doublebranch}
+\citation{wang2021deeplearning}
+\citation{huang2017densely}
+\citation{huang2017densely}
+\citation{hu2018squeeze}
+\@writefile{toc}{\contentsline {section}{\numberline {III}Methodology}{3}{section.3}\protected@file@percent }
+\newlabel{sec:methodology}{{III}{3}{Methodology}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Notation}{3}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Dataset}{3}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Preprocessing Pipeline}{3}{subsection.3.3}\protected@file@percent }
+\newlabel{sec:preprocessing}{{\mbox  {III-C}}{3}{Preprocessing Pipeline}{subsection.3.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-C}0a}DICOM to Hounsfield Units.}{3}{paragraph.3.3.0.1}\protected@file@percent }
+\newlabel{eq:hu_conversion}{{1}{3}{DICOM to Hounsfield Units}{equation.3.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-C}0b}CT Windowing.}{3}{paragraph.3.3.0.2}\protected@file@percent }
+\newlabel{eq:windowing}{{2}{3}{CT Windowing}{equation.3.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-C}0c}Remark on Adjacent-Slice Context.}{3}{paragraph.3.3.0.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Stage 1: Per-Slice CNN Ensemble}{3}{subsection.3.4}\protected@file@percent }
+\newlabel{sec:stage1}{{\mbox  {III-D}}{3}{Stage 1: Per-Slice CNN Ensemble}{subsection.3.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-D}1}Backbones}{3}{subsubsection.3.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-D}2}Ensemble Averaging}{3}{subsubsection.3.4.2}\protected@file@percent }
+\newlabel{eq:ensemble}{{3}{3}{Ensemble Averaging}{equation.3.3}{}}
+\citation{wang2021deeplearning}
+\citation{kingma2015adam}
+\citation{loshchilov2017sgdr}
+\citation{chilamkurthy2018cq500}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Grad-CAM activation maps for the \emph  {intraparenchymal hemorrhage} class. Stage-1 activations concentrate on the hyperdense intraparenchymal region; Stage-2 context propagation further sharpens the decision boundary at adjacent slices.\relax }}{4}{figure.caption.2}\protected@file@percent }
+\newlabel{fig:gradcam_iph}{{2}{4}{Grad-CAM activation maps for the \emph {intraparenchymal hemorrhage} class. Stage-1 activations concentrate on the hyperdense intraparenchymal region; Stage-2 context propagation further sharpens the decision boundary at adjacent slices.\relax }{figure.caption.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Stage 2: Bidirectional GRU Sequence Model}{4}{subsection.3.5}\protected@file@percent }
+\newlabel{sec:stage2}{{\mbox  {III-E}}{4}{Stage 2: Bidirectional GRU Sequence Model}{subsection.3.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}1}Sequence sub-network 1 (SM1): FC + BiGRU}{4}{subsubsection.3.5.1}\protected@file@percent }
+\newlabel{eq:sm1_fc}{{4}{4}{Sequence sub-network 1 (SM1): FC + BiGRU}{equation.3.4}{}}
+\newlabel{eq:sm1_gru}{{5}{4}{Sequence sub-network 1 (SM1): FC + BiGRU}{equation.3.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}2}Sequence sub-network 2 (SM2): Conv1D + BiGRU with skip}{4}{subsubsection.3.5.2}\protected@file@percent }
+\newlabel{eq:sm2_input}{{6}{4}{Sequence sub-network 2 (SM2): Conv1D + BiGRU with skip}{equation.3.6}{}}
+\newlabel{eq:sm2_convs}{{7}{4}{Sequence sub-network 2 (SM2): Conv1D + BiGRU with skip}{equation.3.7}{}}
+\newlabel{eq:stage2_out}{{8}{4}{Sequence sub-network 2 (SM2): Conv1D + BiGRU with skip}{equation.3.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-F}}Loss Function and Class Imbalance}{4}{subsection.3.6}\protected@file@percent }
+\newlabel{sec:loss}{{\mbox  {III-F}}{4}{Loss Function and Class Imbalance}{subsection.3.6}{}}
+\newlabel{eq:bce}{{9}{4}{Loss Function and Class Imbalance}{equation.3.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-G}}Training Protocol}{4}{subsection.3.7}\protected@file@percent }
+\newlabel{sec:training}{{\mbox  {III-G}}{4}{Training Protocol}{subsection.3.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Experiments}{4}{section.4}\protected@file@percent }
+\newlabel{sec:experiments}{{IV}{4}{Experiments}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Dataset and Splits}{4}{subsection.4.1}\protected@file@percent }
+\citation{mlflow2018}
+\citation{ruslan2020dvc}
+\citation{efron1994introduction}
+\citation{wang2021deeplearning}
+\citation{wang2021deeplearning}
+\citation{wang2021deeplearning}
+\citation{selvaraju2017gradcam}
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces CQ500 study-level class distribution. Percentages are relative to the 491 total studies.\relax }}{5}{table.caption.3}\protected@file@percent }
+\newlabel{tab:dataset}{{I}{5}{CQ500 study-level class distribution. Percentages are relative to the 491 total studies.\relax }{table.caption.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Experimental Conditions}{5}{subsection.4.2}\protected@file@percent }
+\newlabel{sec:conditions}{{\mbox  {IV-B}}{5}{Experimental Conditions}{subsection.4.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Hardware and Software}{5}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Evaluation Metrics}{5}{subsection.4.4}\protected@file@percent }
+\newlabel{sec:metrics}{{\mbox  {IV-D}}{5}{Evaluation Metrics}{subsection.4.4}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-D}0a}Area under the ROC curve (AUC).}{5}{paragraph.4.4.0.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-D}0b}Sensitivity and Specificity.}{5}{paragraph.4.4.0.2}\protected@file@percent }
+\newlabel{eq:sens_spec}{{10}{5}{Sensitivity and Specificity}{equation.4.10}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-D}0c}Bootstrap 95\,\% Confidence Intervals.}{5}{paragraph.4.4.0.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Results}{5}{section.5}\protected@file@percent }
+\newlabel{sec:results}{{V}{5}{Results}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Stage-1 Per-Slice Classification}{5}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Stage-2 Sequence Model}{5}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Sensitivity and Specificity}{5}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Qualitative Analysis: Grad-CAM Visualisations}{5}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-E}}Discussion}{5}{subsection.5.5}\protected@file@percent }
+\bibstyle{IEEEtran}
+\bibdata{bibliography/references}
+\bibcite{feigin2013global}{1}
+\bibcite{lovelock2010incidence}{2}
+\bibcite{hemphill2015ahaguideline}{3}
+\bibcite{broderick2007ich}{4}
+\bibcite{rsna2019}{5}
+\bibcite{wang2021deeplearning}{6}
+\bibcite{cho2021systematic}{7}
+\bibcite{chilamkurthy2018cq500}{8}
+\bibcite{shin2016deeplearning}{9}
+\bibcite{tajbakhsh2016convolutional}{10}
+\bibcite{schlemper2019attention}{11}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Stage-1 per-class AUC on the CQ500 test split. 95\,\% bootstrap CI shown in parentheses. \textbf  {Bold} marks the best single-backbone result per column. ``Ensemble'' averages logits from all three models. ($\uparrow $ higher is better.)\relax }}{6}{table.caption.4}\protected@file@percent }
+\newlabel{tab:stage1_auc}{{II}{6}{Stage-1 per-class AUC on the CQ500 test split. 95\,\% bootstrap CI shown in parentheses. \textbf {Bold} marks the best single-backbone result per column. ``Ensemble'' averages logits from all three models. ($\uparrow $ higher is better.)\relax }{table.caption.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Macro-AUC on CQ500 test set for ablation conditions ($\uparrow $ higher is better; 95\,\% CI in parentheses).\relax }}{6}{table.caption.5}\protected@file@percent }
+\newlabel{tab:stage2_auc}{{III}{6}{Macro-AUC on CQ500 test set for ablation conditions ($\uparrow $ higher is better; 95\,\% CI in parentheses).\relax }{table.caption.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Per-class sensitivity and specificity of the full model (condition\nobreakspace  {}4) at threshold $\tau = 0.5$ on the CQ500 test set.\relax }}{6}{table.caption.6}\protected@file@percent }
+\newlabel{tab:sens_spec}{{IV}{6}{Per-class sensitivity and specificity of the full model (condition~4) at threshold $\tau = 0.5$ on the CQ500 test set.\relax }{table.caption.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Conclusion}{6}{section.6}\protected@file@percent }
+\newlabel{sec:conclusion}{{VI}{6}{Conclusion}{section.6}{}}
+\@writefile{toc}{\contentsline {section}{References}{6}{section*.7}\protected@file@percent }
+\bibcite{hu2018squeeze}{12}
+\bibcite{ye2019hemorrhage}{13}
+\bibcite{sage2020doublebranch}{14}
+\bibcite{ouyang2020video}{15}
+\bibcite{lakshminarayanan2017simple}{16}
+\bibcite{topol2019highperformance}{17}
+\bibcite{moons2015tripod}{18}
+\bibcite{huang2017densely}{19}
+\bibcite{kingma2015adam}{20}
+\bibcite{loshchilov2017sgdr}{21}
+\bibcite{mlflow2018}{22}
+\bibcite{ruslan2020dvc}{23}
+\bibcite{efron1994introduction}{24}
+\bibcite{selvaraju2017gradcam}{25}
+\@writefile{toc}{\contentsline {section}{Appendix\nobreakspace  A: Author Contributions}{7}{section*.8}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Team member ownership by pipeline stage.\relax }}{7}{table.caption.9}\protected@file@percent }
+\newlabel{tab:contributions}{{V}{7}{Team member ownership by pipeline stage.\relax }{table.caption.9}{}}
+\gdef \@abspage@last{7}

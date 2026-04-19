@@ -1,0 +1,79 @@
+\documentclass[conference]{IEEEtran}
+
+% ── Packages ───────────────────────────────────────────────────────────────
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{newtxtext}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{graphicx}
+\usepackage{dblfloatfix}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{bm}
+\usepackage{siunitx}
+
+% ── Metadata ───────────────────────────────────────────────────────────────
+\def\papertitle{%
+  Automatic Detection and Classification of Intracranial Hemorrhage in
+  Head CT Scans: A Two-Stage Deep Learning Approach with Sequence Context
+  and Study-Level Refinement}
+\def\paperauthor{My Nguuyen Tra, Long Trinh Le Hoang, Hao Nguyen Thien}
+
+\hypersetup{
+    pdftitle={\papertitle},
+    pdfauthor={\paperauthor},
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=blue,
+    urlcolor=blue,
+}
+
+% ── Macros ─────────────────────────────────────────────────────────────────
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\HU}{\mathrm{HU}}
+\newcommand{\BCE}{\mathcal{L}_{\mathrm{BCE}}}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\begin{document}
+
+\title{\papertitle}
+
+\author{
+    My Nguyen Tra,~Long Trinh Le Hoang,~and~Hao Nguyen Thien%
+    \thanks{The authors are with the Faculty of Electronics and
+    Telecommunications, University of Engineering and Technology,
+    Vietnam National University, Hanoi, Vietnam.
+    E-mail: \{mynguyentra, longtrinhlehoang, haonguyenthien\}@example.com}
+}
+
+\IEEEoverridecommandlockouts
+\maketitle
+
+% ── Abstract ───────────────────────────────────────────────────────────────
+\input{sections/abstract}
+
+% ── Body ───────────────────────────────────────────────────────────────────
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/methodology}
+\input{sections/experiments}
+\input{sections/results}
+\input{sections/conclusion}
+
+% ── Bibliography ───────────────────────────────────────────────────────────
+\bibliographystyle{IEEEtran}
+\bibliography{bibliography/references}
+
+% ── Appendix ───────────────────────────────────────────────────────────────
+\input{sections/appendix}
+
+\end{document}

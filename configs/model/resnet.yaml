@@ -1,0 +1,13 @@
+name: resnet50d
+backbone: resnet50d
+pretrained: true
+pretrained_weights: imagenet
+freeze_backbone: false
+freeze_epochs: 0
+dropout: 0.4
+num_input_channels: 3
+pooling: avg
+head:
+  hidden_dim: 256
+  num_layers: 1
+  activation: relu

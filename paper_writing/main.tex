@@ -1,0 +1,82 @@
+\documentclass[conference]{IEEEtran}
+
+% ── Packages ───────────────────────────────────────────────────────────────
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+% newtxtext provides Times-compatible text fonts as proper Type 1 files,
+% avoiding the ptmr8r font-map issue that affects some TeX Live installations.
+% Only the text font is replaced; math stays as Computer Modern to avoid
+% conflicts with amssymb / amsfonts.
+\usepackage{newtxtext}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{graphicx}
+\usepackage{dblfloatfix}   % enables figure*[!b] on page 1
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{subcaption}
+\usepackage{float}       % provides [H] exact placement
+\usepackage{bm}          % bold math
+\usepackage{siunitx}     % units (\SI{0.05}{\metre})
+
+% ── Metadata ───────────────────────────────────────────────────────────────
+\def\papertitle{Enhanced Mapping Using Infrastructure-Based Camera Networks}
+\def\paperauthor{Author One, Author Two}
+
+\hypersetup{
+    pdftitle={\papertitle},
+    pdfauthor={\paperauthor},
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=blue,
+    urlcolor=blue,
+}
+
+\usepackage{dblfloatfix}
+% ── Macros ─────────────────────────────────────────────────────────────────
+\newcommand{\Tmapframe}{\mathbf{T}_{\text{map}}}
+\newcommand{\Todom}{\mathbf{T}_{\text{odom}}}
+\newcommand{\Tcamrobot}{\mathbf{T}_{\text{cam} \to \text{robot}}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\begin{document}
+
+\title{\papertitle}
+
+\author{
+    Hao Nguyen Thien,~Dung Bui Manh,~and~Luc Xuan Le%
+    \thanks{The authors are with the Faculty of Electronics and
+    Telecommunications, University of Engineering and Technology,
+    Vietnam National University, Hanoi, Vietnam.
+    E-mail: \{thienhaonguyen07, buimanhdung, email\}@example.com}
+}
+
+\IEEEoverridecommandlockouts   % allow \thanks{} in conference mode
+\maketitle
+
+% ── Abstract ───────────────────────────────────────────────────────────────
+\input{sections/abstract}
+
+% ── Body ───────────────────────────────────────────────────────────────────
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/methodology}
+\input{sections/experiments}
+\input{sections/results}
+\input{sections/conclusion}
+
+% ── Acknowledgements (optional) ────────────────────────────────────────────
+% \section*{Acknowledgement}
+% This work was supported by ...
+
+% ── Bibliography ───────────────────────────────────────────────────────────
+\bibliographystyle{IEEEtran}
+\bibliography{bibliography/references}
+
+\end{document}

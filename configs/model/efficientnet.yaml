@@ -1,0 +1,13 @@
+name: efficientnet_b4
+backbone: efficientnet_b4
+pretrained: true
+pretrained_weights: imagenet
+freeze_backbone: false
+freeze_epochs: 0       # 0 = don't freeze at all
+dropout: 0.3
+num_input_channels: 3
+pooling: avg           # avg | max | gem
+head:
+  hidden_dim: 512
+  num_layers: 2
+  activation: relu

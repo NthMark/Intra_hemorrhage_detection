@@ -1,0 +1,97 @@
+\section{Related Work}
+\label{sec:related_work}
+
+% ── Instructions ─────────────────────────────────────────────────────────
+% Organise into subsections by theme. Each subsection: survey existing work,
+% identify limitation, link to your approach. Aim for 40–60 references total.
+% ─────────────────────────────────────────────────────────────────────────
+
+\subsection{Graph-Based SLAM}
+
+Graph-based SLAM~\cite{grisetti2010tutorial} represents the robot trajectory
+as a factor graph whose nodes are poses and whose edges encode odometry or
+loop-closure constraints.
+Optimisation with Gauss–Newton or Levenberg–Marquardt~\cite{ceres-solver}
+minimises the total squared residual.
+A representative implementation~\cite{macenski2021slam} extends this
+with lifelong and multi-session mapping, operating in synchronous or
+asynchronous scan-matching modes.
+A key limitation of purely LiDAR-based graphs is that drift accumulates in
+featureless corridors where loop-closure opportunities are rare.
+
+\subsection{Infrastructure Camera Localisation}
+
+Infrastructure-mounted cameras offer a complementary sensing modality for
+indoor localization because they observe the robot from viewpoints that are
+independent of the robot's onboard motion.
+However, as emphasized in YOWO~\cite{yang2025yowo}, reliable registration of
+ceiling-mounted cameras to the scene layout remains the key bottleneck.
+The related literature highlighted by YOWO falls into three main groups.
+
+The first group uses SLAM or visual localization to reconstruct an indoor scene
+and then localize a query camera against that scene model.
+Representative methods such as InLoc~\cite{taira2018inloc} and hierarchical
+visual localization~\cite{sarlin2019coarse} achieve strong performance in
+indoor visual localization, but they rely heavily on static scene features and
+can degrade under viewpoint disparity, repeated structures, and ambiguous
+textures.
+These challenges become more severe when matching ceiling-mounted cameras
+against egocentric observations collected from very different perspectives.
+
+The second group estimates relative poses between infrastructure cameras by
+tracking mobile keypoints, often from a human moving through the scene.
+Examples include extrinsic camera calibration from a moving person
+~\cite{lee2022extrinsic} and online marker-free extrinsic calibration using
+person keypoints~\cite{patzold2022online}.
+These methods are robust to cross-view ambiguity because they rely on dynamic
+agents rather than static scene appearance, but they typically recover only
+relative camera geometry and do not automatically align the resulting camera
+poses to a globally consistent scene map.
+
+The third group studies collaboration between egocentric and external cameras.
+Works such as EgoHumans~\cite{khirodkar2023egohumans} show that combining
+egocentric and externally mounted views improves downstream perception tasks,
+but camera registration is generally handled beforehand as a separate step.
+YOWO is important because it explicitly connects these three lines of research
+and argues for a unified formulation that jointly maps the scene and registers
+ceiling-mounted cameras.
+
+Our work shares YOWO's motivation that post-hoc registration is fragile, but it
+targets a different estimation setting: instead of RGB-D scene reconstruction
+with collaborative ego and overhead video, we focus on 2D LiDAR pose-graph SLAM
+and use fixed cameras as static anchor sources for reducing drift in the robot
+trajectory.
+
+\subsection{Constraint Injection in SLAM}
+
+Suppressing cumulative drift by injecting external constraints into the SLAM
+optimization graph is a well-established idea.
+Two common sources of such constraints are semantic landmarks and
+infrastructure-based ranging anchors.
+For example, fusing UWB range measurements with short-range 2D LiDAR can add
+global distance constraints that reduce the position drift and map divergence of
+standalone 2D SLAM~\cite{liu2022uwb2dlidar}.
+However, UWB-based approaches remain sensitive to indoor non-line-of-sight and
+multipath effects, and their performance often depends on a sufficiently dense,
+pre-installed anchor infrastructure~\cite{liu2022uwb_nlos,jiang2025gpsdenied}.
+
+Semantic or vision-aided SLAM methods inject higher-level environmental cues to
+improve loop closure and map consistency.
+For instance, low-cost LiDAR-vision fusion has been used to build 2.5D maps and
+stabilize localization by combining complementary geometric and visual
+information~\cite{jiang2019lidarvision}.
+Yet these methods can become computationally demanding and may degrade in
+environments with repetitive appearance, dynamic objects, or weakly distinctive
+textures.
+
+Structurally, our method is closest to SLAM systems that bound drift by adding
+absolute reference measurements to a pose graph.
+In outdoor mapping, Global Positioning System (GPS) observations play this role
+by constraining the long-term drift of LiDAR odometry.
+Surveys of GPS-denied LiDAR SLAM make clear, however, that such global fixes are
+unavailable in indoor facilities and deep urban canyons, where signal
+attenuation or occlusion renders satellite positioning unreliable or unusable
+~\cite{jiang2025gpsdenied}.
+Our method follows the same design principle of augmenting the graph with
+external absolute references, but replaces GPS or UWB range anchors with
+camera-derived robot observations from fixed infrastructure cameras.

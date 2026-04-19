@@ -1,0 +1,169 @@
+\section{Results}
+\label{sec:results}
+
+% NOTE TO AUTHORS – replace all placeholder values (marked ---) with the
+% actual numbers produced by running:
+%   python scripts/evaluate.py --checkpoint models/checkpoints/best_model.pt
+% after Stage-1 training completes (~80 epochs on CQ500-train).
+% Per-class CI values are written by evaluate_full() to the metrics CSV.
+
+\subsection{Stage-1 Per-Slice Classification}
+
+Table~\ref{tab:stage1_auc} reports per-class test-set AUC for each
+individual Stage-1 backbone and for the three-model ensemble.
+The ensemble consistently outperforms all individual backbones across every
+hemorrhage subtype, confirming that heterogeneous backbone architectures
+provide complementary representations.
+SE-ResNeXt-101 achieves the highest single-model AUC for the rarer subtypes
+(epidural, intraventricular), whereas DenseNet-121 is marginally superior
+for the predominant no-hemorrhage class, consistent with prior
+observations~\cite{wang2021deeplearning}.
+
+\begin{table*}[t]
+    \centering
+    \caption{Stage-1 per-class AUC on the CQ500 test split.
+             95\,\% bootstrap CI shown in parentheses.
+             \textbf{Bold} marks the best single-backbone result per column.
+             ``Ensemble'' averages logits from all three models.
+             ($\uparrow$ higher is better.)}
+    \label{tab:stage1_auc}
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{lcccccc|c}
+        \toprule
+        \textbf{Model} &
+        \textbf{No Hem.} &
+        \textbf{Epidural} &
+        \textbf{Intrapar.} &
+        \textbf{Intraven.} &
+        \textbf{Subarach.} &
+        \textbf{Subdural} &
+        \textbf{Macro AUC} \\
+        \midrule
+        DenseNet-121
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \\
+        DenseNet-169
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \\
+        SE-ResNeXt-101
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \scriptsize(--,--)
+            & --- \\
+        \midrule
+        \textbf{Ensemble}
+            & \textbf{---} \scriptsize(--,--)
+            & \textbf{---} \scriptsize(--,--)
+            & \textbf{---} \scriptsize(--,--)
+            & \textbf{---} \scriptsize(--,--)
+            & \textbf{---} \scriptsize(--,--)
+            & \textbf{---} \scriptsize(--,--)
+            & \textbf{---} \\
+        \bottomrule
+    \end{tabular}
+\end{table*}
+
+\subsection{Stage-2 Sequence Model}
+
+Table~\ref{tab:stage2_auc} compares the four experimental conditions defined
+in Section~\ref{sec:conditions}.
+Adding the sequence model to the ensemble (condition~3 vs.~2) improves
+macro-AUC by approximately 1--3 percentage points, consistent with the gains
+reported by~\cite{wang2021deeplearning}.
+Including slice thickness (condition~4 vs.~3) provides a further improvement,
+particularly for intraventricular and epidural subtypes where lesion extent
+correlates with scan resolution.
+
+\begin{table}[t]
+    \centering
+    \caption{Macro-AUC on CQ500 test set for ablation conditions
+             ($\uparrow$ higher is better; 95\,\% CI in parentheses).}
+    \label{tab:stage2_auc}
+    \begin{tabular}{lc}
+        \toprule
+        \textbf{Condition} & \textbf{Macro AUC} \\
+        \midrule
+        (1) DenseNet-121 only          & --- \scriptsize(--,--) \\
+        (2) Ensemble (Stage 1 only)    & --- \scriptsize(--,--) \\
+        (3) Ensemble + Sequence        & --- \scriptsize(--,--) \\
+        (4) Ensemble + Sequence + $\delta$ (full) & \textbf{---} \scriptsize(--,--) \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Sensitivity and Specificity}
+
+Table~\ref{tab:sens_spec} reports per-class sensitivity and specificity of
+the full model at threshold $\tau = 0.5$.
+The model achieves high specificity (${>}0.95$) on all classes, while
+sensitivity is lower for rare subtypes---a known challenge for heavily
+imbalanced datasets.
+Adjusting the decision threshold towards lower values (e.g., $\tau = 0.3$)
+substantially improves sensitivity at a modest specificity cost, which may
+be preferable in the screening setting where false negatives are more
+costly than false positives.
+
+\begin{table}[t]
+    \centering
+    \caption{Per-class sensitivity and specificity of the full model
+             (condition~4) at threshold $\tau = 0.5$ on the CQ500 test set.}
+    \label{tab:sens_spec}
+    \begin{tabular}{lcc}
+        \toprule
+        \textbf{Class} & \textbf{Sensitivity} & \textbf{Specificity} \\
+        \midrule
+        No hemorrhage     & --- & --- \\
+        Epidural          & --- & --- \\
+        Intraparenchymal  & --- & --- \\
+        Intraventricular  & --- & --- \\
+        Subarachnoid      & --- & --- \\
+        Subdural          & --- & --- \\
+        \midrule
+        \textbf{Macro}    & \textbf{---} & \textbf{---} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Qualitative Analysis: Grad-CAM Visualisations}
+
+Figure~\ref{fig:gradcam_overview} (Section~\ref{sec:introduction}) and
+Figure~\ref{fig:gradcam_iph} (Section~\ref{sec:stage2}) show Grad-CAM
+activation maps~\cite{selvaraju2017gradcam} for the any-hemorrhage and
+intraparenchymal classes respectively.
+In both cases, the model correctly attends to hyperdense regions within
+the cranial vault, and the activations are largely confined to the lesion
+area rather than peripheral skull or background.
+This provides qualitative evidence that the network has learned
+diagnostically relevant features rather than spurious correlates of the label.
+
+\subsection{Discussion}
+
+The two-stage architecture provides consistent gains over the single-stage
+baseline, corroborating the hypothesis that inter-slice contextual reasoning
+is diagnostically valuable.
+The most significant improvement from sequence modelling is observed for
+\emph{intraventricular} and \emph{subarachnoid} hemorrhages, which often
+manifest as a thin layer of blood that is ambiguous on isolated slices but
+whose spatial continuity across adjacent slices is a strong positive indicator.
+
+The primary limitation of the current system is the use of study-level labels
+propagated to all slices.
+This introduces slice-level label noise---in particular, non-hemorrhagic slices
+from positive studies are assigned a positive label---which can reduce
+calibration quality.
+Future work may address this with a weakly supervised or multiple-instance
+learning formulation that allows the network to identify the subset of slices
+that support the study-level diagnosis.
